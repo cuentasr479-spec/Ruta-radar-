@@ -2,7 +2,7 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#060A12">
 <meta name="google" content="notranslate">
 <title>Ruta Radar</title>
@@ -59,9 +59,9 @@ html:not([data-theme="light"]) .leaflet-tile-pane { filter: invert(1) hue-rotate
 .ctl button { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--glass); display: grid; place-items: center; backdrop-filter: blur(8px); }
 
 .cross { position: absolute; left: 50%; top: 50%; width: 48px; height: 48px; margin: -24px 0 0 -24px; pointer-events: none; z-index: 1000; display: none; }
-.stage.reporting .cross { display: block; }
+.stage.reporting .cross, .stage.picking .cross { display: block; }
 
-.hud, .detail { position: absolute; left: 12px; right: 12px; bottom: 28px; z-index: 1000; background: var(--glass); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(8px); }
+.hud, .detail, .routecard, .destbtn { background: var(--glass); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(8px); }
 .hud { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 16px; }
 .hud small { display: block; font: 600 10px/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
 .hud .nx { font: 700 21px/1.05 var(--font-head); letter-spacing: .02em; }
@@ -69,7 +69,7 @@ html:not([data-theme="light"]) .leaflet-tile-pane { filter: invert(1) hue-rotate
 .hud .sp { text-align: right; padding-left: 14px; border-left: 1px solid var(--line); }
 .hud .sp b { display: inline-block; font: 700 40px/1 var(--font-num); color: var(--green); font-variant-numeric: tabular-nums; }
 .hud .sp span { font: 600 13px/1 var(--font-body); color: var(--muted); margin-left: 3px; }
-.stage.reporting .hud, .stage.reporting .detail { display: none; }
+.stage.reporting .dock { display: none; }
 
 .detail { padding: 12px 14px; display: none; }
 .detail.on { display: block; }
@@ -158,6 +158,43 @@ html:not([data-theme="light"]) .leaflet-tile-pane { filter: invert(1) hue-rotate
 
 .toast { position: absolute; left: 50%; top: 70px; transform: translateX(-50%); z-index: 1500; background: var(--ink); color: var(--bg); padding: 9px 14px; border-radius: 10px; font-weight: 600; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: calc(100% - 32px); text-align: center; }
 .toast.on { opacity: 1; }
+.dock { position: absolute; left: 12px; right: 12px; bottom: 28px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
+.destbtn { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 0 16px; text-align: left; font-size: 16px; color: var(--muted); }
+.destbtn svg { width: 22px; height: 22px; color: var(--green); flex: none; }
+.routecard { padding: 12px 14px; display: none; }
+.routecard.on { display: block; }
+.rc-top { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; align-items: center; }
+.rc-name { display: block; font: 700 12px/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--sc); margin-bottom: 4px; }
+.rc-main { font: 700 28px/1 var(--font-num); font-variant-numeric: tabular-nums; }
+.rc-main span { font: 500 14px/1 var(--font-body); color: var(--muted); margin-left: 8px; }
+.score { text-align: center; min-width: 62px; padding: 0 4px 0 12px; border-left: 1px solid var(--line); }
+.score b { display: block; font: 700 32px/1 var(--font-num); color: var(--sc); font-variant-numeric: tabular-nums; }
+.score small { display: block; font: 600 9.5px/1.1 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+.rc-x { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: transparent; flex: none; }
+.rc-note { margin: 6px 0 0; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.rc-alts { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; padding-bottom: 2px; }
+.rc-alts:empty { display: none; }
+.alt { flex: none; min-height: 44px; padding: 4px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel2); text-align: left; font-size: 12.5px; line-height: 1.2; }
+.alt b { display: block; font-weight: 600; }
+.alt span { color: var(--muted); font-variant-numeric: tabular-nums; }
+.alt[aria-pressed="true"] { border-color: var(--sc2); box-shadow: inset 0 0 0 1px var(--sc2); }
+.sheet.top { top: 0; bottom: auto; border-top: 0; border-bottom: 1px solid var(--line); border-radius: 0 0 20px 20px; transform: translateY(-105%); padding-top: 14px; max-height: 80%; }
+.sheet.top.on { transform: translateY(0); }
+.sform { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin: 12px 0 8px; }
+.sform input { min-width: 0; min-height: 48px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); padding: 0 14px; font: inherit; font-size: 16px; }
+.sform input:focus-visible { outline: 2px solid var(--green); outline-offset: 1px; }
+.sform .btn { padding: 0 18px; }
+.pickmap { width: 100%; min-height: 44px; border-radius: 12px; border: 1px dashed var(--line); background: transparent; color: var(--green); font-weight: 600; }
+.results { list-style: none; margin: 8px 0 12px; padding: 0; }
+.results .msg { color: var(--muted); padding: 10px 2px; font-size: 14px; }
+.results button { display: block; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid var(--line); padding: 12px 2px; }
+.results b { display: block; font-weight: 600; }
+.results span { display: block; color: var(--muted); font-size: 13px; }
+.pickbar { position: absolute; left: 12px; right: 12px; bottom: 28px; z-index: 1100; display: none; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pickbar .btn.ghost { background: var(--panel); }
+.stage.picking .pickbar { display: grid; }
+.stage.picking .dock, .stage.picking .risk { display: none; }
+.destpin { width: 30px; height: 30px; border-radius: 50%; background: #fff; color: #0E1A2E; border: 3px solid #FF4D4D; font: 700 15px/24px var(--font-num); text-align: center; box-shadow: 0 2px 6px rgba(0, 0, 0, .5); }
 @media (prefers-reduced-motion: reduce) {
   #radarSvg .sweep, .me-dot::after { animation: none; }
   .sheet, .toast { transition: none; }
@@ -194,11 +231,24 @@ html:not([data-theme="light"]) .leaflet-tile-pane { filter: invert(1) hue-rotate
       <g stroke="#0E1A2E" stroke-width="2.2" stroke-linecap="round"><circle cx="22" cy="22" r="7"/><path d="M22 3v9M22 32v9M3 22h9M32 22h9"/></g>
     </svg>
 
-    <div class="hud" id="hud">
-      <div><small>Próxima alerta</small><div class="nx" id="nx">Sin alertas cerca</div><div class="nxd" id="nxd">Buen viaje</div></div>
-      <div class="sp"><small>Velocidad</small><b id="spd">--</b><span>km/h</span></div>
+    <div class="dock" id="dock">
+      <button class="destbtn" id="destbtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>¿A dónde vamos?</span></button>
+      <div class="routecard" id="routecard">
+        <div class="rc-top">
+          <div><span class="rc-name" id="rcName">Ruta</span><div class="rc-main" id="rcTime"></div></div>
+          <div class="score"><b id="rcScore">--</b><small>Seguridad<br>según alertas</small></div>
+          <button class="rc-x" id="rcClose" type="button" aria-label="Cancelar ruta">✕</button>
+        </div>
+        <p class="rc-note" id="rcNote"></p>
+        <div class="rc-alts" id="rcAlts"></div>
+      </div>
+      <div class="detail" id="detail"></div>
+      <div class="hud" id="hud">
+        <div><small>Próxima alerta</small><div class="nx" id="nx">Sin alertas cerca</div><div class="nxd" id="nxd">Buen viaje</div></div>
+        <div class="sp"><small>Velocidad</small><b id="spd">--</b><span>km/h</span></div>
+      </div>
     </div>
-    <div class="detail" id="detail"></div>
+    <div class="pickbar" id="pickbar"><button class="btn ghost" id="pcancel" type="button">Cancelar</button><button class="btn" id="pok" type="button">Confirmar destino</button></div>
 
     <div class="sheet" id="sheet" role="dialog" aria-label="Reportar alerta">
       <div class="grab"></div>
@@ -206,6 +256,17 @@ html:not([data-theme="light"]) .leaflet-tile-pane { filter: invert(1) hue-rotate
       <p class="hint">Mueve el mapa para poner la mira en el lugar. Empieza donde estás.</p>
       <div class="tgrid" id="tgrid"></div>
       <div class="srow"><button class="btn ghost" id="cancel">Cancelar</button><button class="btn" id="send" disabled>Enviar</button></div>
+    </div>
+
+    <div class="sheet top" id="dsheet" role="dialog" aria-label="Elegir destino">
+      <h2>¿A dónde vamos?</h2>
+      <form class="sform" id="sform" autocomplete="off">
+        <input id="q" type="search" placeholder="Lugar o dirección" enterkeyhint="search" aria-label="Destino">
+        <button class="btn" type="submit">Buscar</button>
+      </form>
+      <button class="pickmap" id="pickmap" type="button">Elegir un punto en el mapa</button>
+      <ul class="results" id="results"></ul>
+      <button class="btn ghost" id="dcancel" type="button" style="width:100%">Cerrar</button>
     </div>
 
     <section class="view" id="v-radar" aria-label="Radar">
@@ -241,9 +302,9 @@ html:not([data-theme="light"]) .leaflet-tile-pane { filter: invert(1) hue-rotate
         <div class="rows">
           <div class="rowi"><span>Modo día / noche</span><button class="sw" id="themeBtn">Noche</button></div>
           <div class="rowi"><span>Datos</span><span id="pData">Solo en este celular</span></div>
-          <div class="rowi"><span>Versión</span><span>0.2</span></div>
+          <div class="rowi"><span>Versión</span><span>0.3</span></div>
         </div>
-        <p class="note">Mapa © colaboradores de OpenStreetMap. Los reportes se borran solos a las 6 horas.</p>
+        <p class="note">El puntaje de seguridad de una ruta se calcula solo con las alertas de la comunidad de Ruta Radar que pasan a menos de 120 m. No usa datos oficiales de accidentes. Mapa y búsqueda: © colaboradores de OpenStreetMap. Rutas: OSRM. Los reportes se borran solos a las 6 horas.</p>
       </div>
     </section>
 
@@ -563,13 +624,13 @@ var FIREBASE_CONFIG = null;
 
   /* ---------- navegación ---------- */
   function renderAll() {
-    renderPins(); updateHud();
+    renderPins(); updateHud(); refreshRoute();
     if (tab === 'alerts') renderAlerts();
     if (tab === 'radar') drawRadar();
     if (tab === 'profile') renderProfile();
   }
   function showTab(t) {
-    tab = t; closeReport();
+    tab = t; closeReport(); closeDest(); exitPick();
     ['radar', 'alerts', 'profile'].forEach(function (v) { $('#v-' + v).classList.toggle('on', v === t); });
     document.querySelectorAll('.nav [data-tab]').forEach(function (b) { b.setAttribute('aria-current', String(b.getAttribute('data-tab') === t)); });
     if (t === 'map') setTimeout(function () { map.invalidateSize(); }, 50);
@@ -598,7 +659,7 @@ var FIREBASE_CONFIG = null;
   });
   function openReport() {
     if (tab !== 'map') showTab('map');
-    reporting = true; selected = null;
+    reporting = true; selected = null; closeDest(); exitPick();
     $('#stage').classList.add('reporting'); $('#sheet').classList.add('on');
     if (me) map.setView(me, Math.max(map.getZoom(), 17));
     renderAll();
@@ -619,6 +680,169 @@ var FIREBASE_CONFIG = null;
     closeReport();
     addReport(rep).then(function () { toast(label + ' reportado'); updateHud(); });
   });
+
+  /* ---------- destino y ruta más segura ---------- */
+  var dest = null, routes = [], activeRoute = 0, lastSig = '', reqId = 0;
+  var routeLayer = L.layerGroup().addTo(map);
+  var NEAR = 120; /* metros: una alerta cuenta si está a menos de esto de la ruta */
+  var dsheet = $('#dsheet'), qEl = $('#q'), resEl = $('#results');
+
+  function segDist(p, a, b) {
+    var rad = Math.PI / 180, kx = 111320 * Math.cos(p[0] * rad), ky = 110540;
+    var ax = (a[1] - p[1]) * kx, ay = (a[0] - p[0]) * ky, bx = (b[1] - p[1]) * kx, by = (b[0] - p[0]) * ky;
+    var dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
+    var t = l2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / l2)) : 0;
+    var cx = ax + t * dx, cy = ay + t * dy;
+    return Math.sqrt(cx * cx + cy * cy);
+  }
+  function routeHits(coords) {
+    var n = 0, pen = 0;
+    visible().forEach(function (r) {
+      if (isCleared(r)) return;
+      var p = [r.lat, r.lng];
+      for (var i = 0; i < coords.length - 1; i++) {
+        if (segDist(p, coords[i], coords[i + 1]) <= NEAR) { n++; pen += TYPES[r.type].w; return; }
+      }
+    });
+    return { n: n, pen: pen };
+  }
+  function scoreRoutes() {
+    routes.forEach(function (rt) {
+      var h = routeHits(rt.coords);
+      rt.hits = h.n; rt.pen = h.pen; rt.score = Math.max(0, Math.round(100 - h.pen * 15));
+    });
+    var fast = 0, safe = 0;
+    routes.forEach(function (rt, i) {
+      if (rt.duration < routes[fast].duration) fast = i;
+      if (rt.pen < routes[safe].pen || (rt.pen === routes[safe].pen && rt.duration < routes[safe].duration)) safe = i;
+    });
+    var differ = routes.some(function (rt) { return rt.pen !== routes[0].pen; });
+    routes.forEach(function (rt, i) {
+      if (routes.length === 1) rt.label = 'Ruta';
+      else if (!differ) rt.label = i === fast ? 'Más rápida' : 'Alterna';
+      else if (i === safe && i === fast) rt.label = 'Más segura y rápida';
+      else if (i === safe) rt.label = 'Más segura';
+      else if (i === fast) rt.label = 'Más rápida';
+      else rt.label = 'Alterna';
+    });
+    return differ ? safe : fast;
+  }
+  function scoreHex(s) { return s >= 80 ? '#35E06A' : s >= 50 ? '#FFC531' : '#FF4D4D'; }
+  function scoreVar(s) { return s >= 80 ? 'var(--green)' : s >= 50 ? 'var(--yellow)' : 'var(--red)'; }
+  function fmtTime(sec) { var m = Math.max(1, Math.round(sec / 60)); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + (m % 60) + ' min'; }
+
+  function getRoutes(from, to) {
+    var ctl = ('AbortController' in window) ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 20000);
+    var url = 'https://router.project-osrm.org/route/v1/driving/' + from[1] + ',' + from[0] + ';' + to[1] + ',' + to[0] + '?alternatives=3&overview=full&geometries=geojson';
+    return fetch(url, ctl ? { signal: ctl.signal } : undefined).then(function (r) {
+      if (!r.ok) throw new Error('http');
+      return r.json();
+    }).then(function (j) {
+      clearTimeout(timer);
+      if (!j.routes || !j.routes.length) throw new Error('none');
+      return j.routes.map(function (r) {
+        return { coords: r.geometry.coordinates.map(function (c) { return [c[1], c[0]]; }), distance: r.distance, duration: r.duration };
+      });
+    });
+  }
+
+  function drawRoutes() {
+    routeLayer.clearLayers();
+    routes.forEach(function (rt, i) {
+      if (i === activeRoute) return;
+      L.polyline(rt.coords, { color: '#8A9BB8', weight: 7, opacity: .75, bubblingMouseEvents: false }).on('click', function () { chooseRoute(i); }).addTo(routeLayer);
+    });
+    var rt = routes[activeRoute];
+    if (rt) {
+      L.polyline(rt.coords, { color: '#06101C', weight: 11, opacity: .85, interactive: false }).addTo(routeLayer);
+      L.polyline(rt.coords, { color: scoreHex(rt.score), weight: 7, opacity: 1, interactive: false }).addTo(routeLayer);
+    }
+    if (dest) L.marker(dest.ll, { icon: L.divIcon({ className: '', html: '<div class="destpin">B</div>', iconSize: [30, 30], iconAnchor: [15, 15] }), keyboard: false, interactive: false }).addTo(routeLayer);
+  }
+  function fitRoute() {
+    var rt = routes[activeRoute]; if (!rt) return;
+    var h = $('#stage').clientHeight || 600;
+    map.fitBounds(L.latLngBounds(rt.coords), { paddingTopLeft: [24, Math.min(140, Math.round(h * .2))], paddingBottomRight: [24, Math.min(330, Math.round(h * .45))], maxZoom: 17 });
+  }
+  function renderRoute() {
+    var has = !!(dest && routes.length), card = $('#routecard');
+    card.classList.toggle('on', has);
+    $('#destbtn').style.display = has ? 'none' : '';
+    if (!has) return;
+    var rt = routes[activeRoute];
+    card.style.setProperty('--sc', scoreVar(rt.score));
+    $('#rcName').textContent = rt.label;
+    $('#rcTime').innerHTML = fmtTime(rt.duration) + '<span>' + fmtDist(rt.distance) + '</span>';
+    $('#rcScore').textContent = String(rt.score);
+    $('#rcNote').textContent = (rt.hits === 0 ? 'Sin alertas de la comunidad en esta ruta' : rt.hits + (rt.hits === 1 ? ' alerta en esta ruta' : ' alertas en esta ruta')) + ' · hacia ' + dest.name;
+    $('#rcAlts').innerHTML = routes.length < 2 ? '' : routes.map(function (r, i) {
+      return '<button class="alt" type="button" data-i="' + i + '" aria-pressed="' + (i === activeRoute) + '" style="--sc2:' + scoreVar(r.score) + '"><b>' + r.label + '</b><span>' + fmtTime(r.duration) + ' · ' + r.score + '/100</span></button>';
+    }).join('');
+  }
+  function refreshRoute() {
+    if (!dest || !routes.length) return;
+    scoreRoutes();
+    var sig = routes.map(function (r) { return r.pen + ':' + r.score; }).join('|') + '#' + activeRoute;
+    if (sig !== lastSig) { lastSig = sig; drawRoutes(); }
+    renderRoute();
+  }
+  function chooseRoute(i) { activeRoute = i; refreshRoute(); fitRoute(); }
+  function clearRoute() { dest = null; routes = []; activeRoute = 0; lastSig = ''; routeLayer.clearLayers(); renderRoute(); }
+
+  function setDestination(ll, name) {
+    closeDest(); exitPick();
+    var from = me || refPoint(), id = ++reqId;
+    clearRoute();
+    dest = { ll: ll, name: name };
+    toast(me ? 'Buscando rutas…' : 'Sin GPS todavía: salgo desde el centro del mapa.');
+    getRoutes(from, ll).then(function (rs) {
+      if (id !== reqId) return;
+      routes = rs; activeRoute = scoreRoutes(); lastSig = '';
+      refreshRoute(); fitRoute();
+      toast(rs.length > 1 ? rs.length + ' rutas encontradas' : 'Encontré una ruta');
+    }).catch(function () {
+      if (id !== reqId) return;
+      clearRoute(); toast('No pude calcular la ruta. Revisa tu conexión o prueba otro destino.');
+    });
+  }
+
+  function openDest() { closeReport(); dsheet.classList.add('on'); setTimeout(function () { qEl.focus(); }, 250); }
+  function closeDest() { dsheet.classList.remove('on'); qEl.blur(); }
+  function exitPick() { $('#stage').classList.remove('picking'); }
+  function msg(t) { resEl.innerHTML = ''; var li = document.createElement('li'); li.className = 'msg'; li.textContent = t; resEl.appendChild(li); }
+  function search(q) {
+    if (q.length < 3) { msg('Escribe al menos 3 letras.'); return; }
+    var c = refPoint(), d = 0.6;
+    var url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=es&countrycodes=co&viewbox=' + [c[1] - d, c[0] + d, c[1] + d, c[0] - d].join(',') + '&q=' + encodeURIComponent(q);
+    msg('Buscando…');
+    fetch(url).then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); }).then(function (list) {
+      if (!list.length) { msg('No encontré ese lugar. Prueba con el nombre del sitio y la ciudad, o usa «Elegir un punto en el mapa».'); return; }
+      resEl.innerHTML = '';
+      list.forEach(function (it) {
+        var lat = parseFloat(it.lat), lon = parseFloat(it.lon);
+        if (!isFinite(lat) || !isFinite(lon)) return;
+        var parts = String(it.display_name || '').split(',');
+        var li = document.createElement('li'), b = document.createElement('button'), t = document.createElement('b'), s = document.createElement('span');
+        b.type = 'button';
+        t.textContent = parts[0].trim();
+        s.textContent = parts.slice(1, 4).join(',').trim();
+        b.appendChild(t); b.appendChild(s);
+        var short = parts.slice(0, 2).join(',').trim();
+        b.addEventListener('click', function () { setDestination([lat, lon], short); });
+        li.appendChild(b); resEl.appendChild(li);
+      });
+    }).catch(function () { msg('No pude buscar ahora. Revisa tu conexión e intenta de nuevo.'); });
+  }
+
+  $('#destbtn').addEventListener('click', openDest);
+  $('#dcancel').addEventListener('click', closeDest);
+  $('#sform').addEventListener('submit', function (e) { e.preventDefault(); search(qEl.value.trim()); });
+  $('#rcClose').addEventListener('click', function () { reqId++; clearRoute(); });
+  $('#rcAlts').addEventListener('click', function (e) { var b = e.target.closest('.alt'); if (b) chooseRoute(parseInt(b.getAttribute('data-i'), 10)); });
+  $('#pickmap').addEventListener('click', function () { closeDest(); $('#stage').classList.add('picking'); toast('Mueve el mapa hasta poner la mira en tu destino.'); });
+  $('#pcancel').addEventListener('click', exitPick);
+  $('#pok').addEventListener('click', function () { var c = map.getCenter(); exitPick(); setDestination([c.lat, c.lng], 'el punto elegido'); });
 
   setInterval(renderAll, 30000);
   initStore();
